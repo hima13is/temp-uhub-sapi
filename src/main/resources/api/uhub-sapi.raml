@@ -1,0 +1,125 @@
+#%RAML 1.0
+title: uhub-sapi
+version: v1
+baseUri: http://{environment}/covid/{version}/
+baseUriParameters:
+  environment:
+    description: DEV, TEST, UAT, PROD
+    enum: ["uho-dev-uhub-sapi.us-e2.cloudhub.io","uho-test-uhub-sapi.us-e2.cloudhub.io", "uho-uat-uhub-sapi.us-e2.cloudhub.io", "uho-prod-uhub-sapi.us-e2.cloudhub.io"]
+traits:
+  client-id-header: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/client-id-required/1.0.0/client-id-required.raml
+  transaction-header: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/trasaction-header/1.0.0/trasaction-header.raml
+  correlation-id-header: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/correlation-header/1.0.0/correlation-header.raml
+  state-query-param: !include uhub-sapi-types/state-query-param.raml
+uses:
+  resource-types: exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/resource-type/1.0.0/resource-type.raml
+  common-data-types: exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/common-data-type/1.0.0/common-data-type.raml
+  uhub-sapi-types: uhub-sapi-types/uhub-sapi-types.raml
+/cases:
+  post:
+    description: To register covid case
+    is: [client-id-header,correlation-id-header,transaction-header]
+    body:
+      application/json:
+        type: uhub-sapi-types.covid-case-request-type
+        example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/covid-case-request/1.0.0/covid-case-request.raml
+    responses:
+      201:
+        body:
+          application/json:
+            type: uhub-sapi-types.covid-case-response-type
+            example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/covid-case-response/1.0.0/covid-case-response.raml
+      400:
+        body:
+          application/json:
+            type: common-data-types.errorType
+            example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/400/1.0.0/400.raml
+      503:
+        body:
+          application/json:
+            type: common-data-types.errorType
+            example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/503/1.0.0/503.raml
+      500:
+        body:
+          application/json:
+            type: common-data-types.errorType
+            example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/500/1.0.0/500.raml
+  put:
+    description: To update covid case
+    is: [client-id-header,correlation-id-header,transaction-header]
+    body:
+      application/json:
+        type: uhub-sapi-types.covid-case-request-type
+        example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/covid-case-request/1.0.0/covid-case-request.raml
+    responses:
+      200:
+        body:
+          application/json:
+            example:
+              type: uhub-sapi-type.covid-case-response-type
+              example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/covid-case-response/1.0.0/covid-case-response.raml
+      400:
+        body:
+          application/json:
+            type: common-data-types.errorType
+            example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/400/1.0.0/400.raml
+      503:
+        body:
+          application/json:
+            type: common-data-types.errorType
+            example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/503/1.0.0/503.raml
+      500:
+        body:
+          application/json:
+            type: common-data-types.errorType
+            example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/500/1.0.0/500.raml
+  /{nationalID}:
+    get:
+      description: To get covid case by national id.
+      is: [client-id-header,correlation-id-header,transaction-header]
+      responses:
+        200:
+          body:
+            application/json:
+              type: uhub-sapi-types.get-cases-by-national-id-response-type
+              example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/covid-case-by-national-id-response/1.0.0/covid-case-by-national-id-response.raml
+        404:
+          body:
+            application/json:
+              type: common-data-types.errorType
+              example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/404/1.0.0/404.raml
+        503:
+          body:
+            application/json:
+              type: common-data-types.errorType
+              example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/503/1.0.0/503.raml   
+        500:
+          body:
+            application/json:
+              type: common-data-types.errorType
+              example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/500/1.0.0/500.raml
+/reports:
+  get:
+    description: To get covid reports
+    is: [client-id-header,correlation-id-header,transaction-header, state-query-param]
+    responses:
+      200:
+        body:
+          application/json:
+            type: uhub-sapi-types.get-reports-response-type
+            example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/get-reports-response/1.0.0/get-reports-response.raml
+      503:
+          body:
+            application/json:
+              type: common-data-types.errorType
+              example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/503/1.0.0/503.raml    
+      500:
+        body:
+            application/json:
+              type: common-data-types.errorType
+              example: !include exchange_modules/9a75e2f3-f2bd-4a68-a230-e381427431ee/500/1.0.0/500.raml
+/health-check:
+  get:
+  type:
+    resource-types.all: 
+      getResponseType: string

@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_4564597f_c373_4550_9b27_4c159fb5b495_Output_Payload = Array<{  report: {    total: Number,     recovered: Number,     death: Number,     positive: Number,     vaccinated: Number,     _?: Any  },   state: String,   _?: Any}>
+

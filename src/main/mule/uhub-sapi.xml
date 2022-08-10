@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <http:listener-config name="uhub-sapi-httpListenerConfig" basePath="covid">
+        <http:listener-connection host="0.0.0.0" port="8081" />
+    </http:listener-config>
+    <apikit:config name="uhub-sapi-config" api="uhub-sapi.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="uhub-sapi-main">
+        <http:listener config-ref="uhub-sapi-httpListenerConfig" path="/v1/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="uhub-sapi-config" />
+		<error-handler ref="global-error-handler" />
+    </flow>
+    <flow name="uhub-sapi-console">
+        <http:listener config-ref="uhub-sapi-httpListenerConfig" path="/console/*">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body>#[payload]</http:body>
+                <http:headers>#[vars.outboundHeaders default {}]</http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="uhub-sapi-config" />
+        <error-handler>
+            <on-error-propagate type="APIKIT:NOT_FOUND">
+                <ee:transform>
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{message: "Resource not found"}]]></ee:set-payload>
+                    </ee:message>
+                    <ee:variables>
+                        <ee:set-variable variableName="httpStatus">404</ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </on-error-propagate>
+        </error-handler>
+    </flow>
+    <flow name="put:\cases:application\json:uhub-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="aa3a97ab-89c0-489a-8aa6-3ef01f246cb5" name="put:\cases:application\json:uhub-sapi-configg"/>
+    </flow>
+    <flow name="get:\health-check:uhub-sapi-config">
+        <flow-ref doc:name="Flow Reference" doc:id="ac044b3f-0f70-4906-bfa2-c3527b6cde15" name="get:\health-check:uhub-sapi-configg"/>
+    </flow>
+    <flow name="get:\reports:uhub-sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="6343ebe6-9041-400d-af3f-0307655d92a8" name="get:\reports:uhub-sapi-configg"/>
+    </flow>
+    <flow name="get:\cases\(nationalID):uhub-sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="c4473a99-640f-4918-b301-4136fa0c3b5d" name="get:\cases\(nationalID):uhub-sapi-configg"/>
+    </flow>
+    <flow name="post:\cases:application\json:uhub-sapi-config">
+		<flow-ref doc:name="Flow Reference" doc:id="c468dc59-0896-4a76-be94-3e8dd0127c3f" name="post:\cases:application\json:uhub-sapi-configg"/>
+    </flow>
+</mule>

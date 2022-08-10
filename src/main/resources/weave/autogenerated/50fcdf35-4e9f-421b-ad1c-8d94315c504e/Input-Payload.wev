@@ -1,0 +1,23 @@
+%dw 2.0
+
+type auto_50fcdf35_4e9f_421b_ad1c_8d94315c504e_Input_Payload = {
+  firstName: String, 
+  lastName: String, 
+  address: {
+    country: String, 
+    streetAddress: String, 
+    city: String, 
+    state: String, 
+    postal: String, 
+    _?: Any
+  }, 
+  nationalID: String, 
+  phone: String, 
+  dateOfBirth: String, 
+  source: String, 
+  email?: String, 
+  nationalIDType: String, 
+  caseType: String, 
+  _?: Any
+} {"description": "This type used to register and update covid case"}
+
